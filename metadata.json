@@ -1,0 +1,6 @@
+{
+  "name": "Opal: AI Curriculum Architect",
+  "description": "An AI-powered Master Educator that transforms any user-specified subject into a comprehensive, multi-stage lesson program, complete with modules, quizzes, and a final test.",
+  "requestFramePermissions": [],
+  "resizable": true
+}

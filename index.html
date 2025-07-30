@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opal: AI Curriculum Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- KaTeX for LaTeX Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+    <!-- The katex.min.js script provides the `renderMathInElement` function used in ContentRenderer.tsx -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    
+    <!-- Marked for Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- ResponsiveVoice Free Tier - No API Key Required -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+    <script>
+      // ResponsiveVoice free tier setup (non-commercial use)
+      window.addEventListener('load', function() {
+        // Wait for ResponsiveVoice to be fully loaded
+        let checkCount = 0;
+        const maxChecks = 50;
+        
+        const checkResponsiveVoice = () => {
+          checkCount++;
+          
+          if (typeof responsiveVoice !== 'undefined' && responsiveVoice.voiceSupport) {
+            console.log('✅ ResponsiveVoice loaded successfully (free tier)');
+            console.log('🔊 Voice support detected:', responsiveVoice.voiceSupport());
+            console.log('🎤 ResponsiveVoice ready for use - no auto-test to avoid permission prompts');
+            
+          } else if (checkCount < maxChecks) {
+            // Keep checking until loaded or max attempts reached
+            setTimeout(checkResponsiveVoice, 100);
+          } else {
+            console.error('❌ ResponsiveVoice failed to load after', maxChecks, 'attempts');
+          }
+        };
+        
+        checkResponsiveVoice();
+      });
+    </script>
+
+    <style>
+      /* Custom styles for rendered markdown content from Gemini */
+      .rendered-content h2 { @apply text-3xl font-bold mt-8 mb-4 border-b border-slate-300 pb-2 text-slate-800; }
+      .rendered-content h3 { @apply text-2xl font-semibold mt-6 mb-3 text-slate-700; }
+      .rendered-content h4 { @apply text-xl font-semibold mt-5 mb-2 text-slate-700; }
+      .rendered-content p { @apply mb-4 leading-relaxed; }
+      .rendered-content ul { @apply list-disc list-inside mb-4 pl-4 space-y-2; }
+      .rendered-content ol { @apply list-decimal list-inside mb-4 pl-4 space-y-2; }
+      .rendered-content li { @apply mb-1; }
+      .rendered-content code:not(pre > code) { @apply bg-slate-200 text-slate-800 rounded px-1.5 py-1 text-sm font-mono; }
+      .rendered-content pre { @apply bg-slate-800 text-slate-100 rounded-lg p-4 my-4 overflow-x-auto; }
+      .rendered-content pre code { @apply bg-transparent p-0; }
+      .rendered-content blockquote { @apply border-l-4 border-slate-400 pl-4 italic text-slate-600 my-4; }
+      .rendered-content a { @apply text-indigo-600 hover:underline; }
+      .rendered-content table { @apply w-full border-collapse my-4; }
+      .rendered-content th, .rendered-content td { @apply border border-slate-300 px-4 py-2; }
+      .rendered-content th { @apply bg-slate-100 font-bold; }
+      .katex-display { @apply overflow-x-auto overflow-y-hidden; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.11.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

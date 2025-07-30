@@ -1,0 +1,51 @@
+{
+  "name": "teachers-pet",
+  "version": "1.0.0",
+  "description": "AI-powered Master Educator that creates comprehensive, interactive learning curricula with text-to-speech capabilities",
+  "type": "module",
+  "main": "index.html",
+  "homepage": "https://github.com/michael5cents/TeachersPet",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michael5cents/TeachersPet.git"
+  },
+  "bugs": {
+    "url": "https://github.com/michael5cents/TeachersPet/issues"
+  },
+  "keywords": [
+    "ai",
+    "education",
+    "curriculum",
+    "text-to-speech",
+    "react",
+    "typescript",
+    "gemini-ai",
+    "responsivevoice",
+    "learning",
+    "teaching"
+  ],
+  "author": "michael5cents",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "echo 'Linting with TypeScript compiler' && tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@google/genai": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
