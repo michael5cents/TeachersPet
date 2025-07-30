@@ -177,7 +177,7 @@ const VoiceSettings: React.FC = () => {
                     console.log('Using default voice (free tier)');
                     
                     // Use simple call with null voice (free tier)
-                    window.responsiveVoice.speak(testText, null, {
+                    window.responsiveVoice.speak(testText, undefined, {
                       onstart: () => console.log('✅ Speech started'),
                       onend: () => console.log('✅ Speech ended'),
                       onerror: (error: any) => console.log('❌ Speech error: ' + error)

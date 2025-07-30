@@ -6,6 +6,7 @@ import MainContent from './components/MainContent';
 import Loader from './components/Loader';
 import { LogoIcon } from './components/icons';
 import { VoiceProvider } from './contexts/VoiceContext';
+import { videoSearchService } from './services/videoSearchService';
 
 const AppContent: React.FC = () => {
   const [subject, setSubject] = useState<string>('');
@@ -22,8 +23,21 @@ const AppContent: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [researchStep, setResearchStep] = useState<string>('');
 
-  // Check for saved data on initial app load
+  // Check for saved data on initial app load and initialize API key
   useEffect(() => {
+    // Initialize YouTube API key from localStorage if available
+    const savedApiKey = localStorage.getItem('youtubeApiKey');
+    if (savedApiKey) {
+      videoSearchService.setYouTubeApiKey(savedApiKey);
+      console.log('🔑 YouTube API key loaded from storage:', savedApiKey.substring(0, 12) + '...');
+    } else {
+      // Set the default API key
+      const defaultKey = 'AIzaSyARx118sjmSaGLFUKVk9ZQCaUx6JwZMW8s';
+      localStorage.setItem('youtubeApiKey', defaultKey);
+      videoSearchService.setYouTubeApiKey(defaultKey);
+      console.log('🔑 Default YouTube API key set:', defaultKey.substring(0, 12) + '...');
+    }
+
     const savedData = localStorage.getItem('opalCurriculum');
     if (savedData) {
       setInitialScreenState('load_prompt');
@@ -37,6 +51,14 @@ const AppContent: React.FC = () => {
       setError('Please enter a subject.');
       return;
     }
+
+    // Ensure API key is set before starting
+    const apiKey = localStorage.getItem('youtubeApiKey');
+    if (apiKey) {
+      videoSearchService.setYouTubeApiKey(apiKey);
+      console.log('🔄 API key re-confirmed before curriculum generation');
+    }
+
     setIsLoading(true);
     setError(null);
     setCurriculum(null);
@@ -61,7 +83,7 @@ const AppContent: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 700));
       
       updateStep('✍️ Generating comprehensive lesson content...');
-      const result = await generateCurriculum(subject);
+      const result = await generateCurriculum(subject, updateStep);
       
       updateStep('🎯 Creating assessment materials and quizzes...');
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -166,33 +188,46 @@ const AppContent: React.FC = () => {
   const renderIntroScreen = () => {
     if (initialScreenState === 'checking') {
       return (
-        <div className="flex items-center justify-center min-h-screen bg-slate-50">
-          <Loader />
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+          <div className="text-center">
+            <LogoIcon className="h-16 w-16 text-purple-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-purple-600 mb-2">Teacher's Pet</h2>
+            <p className="text-slate-600">Getting ready for you...</p>
+          </div>
         </div>
       );
     }
     
     if (initialScreenState === 'load_prompt') {
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-4">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
           <div className="w-full max-w-md text-center">
             <div className="flex justify-center items-center gap-4 mb-6">
-              <LogoIcon className="h-16 w-16 text-indigo-600" />
-              <h1 className="text-5xl font-bold text-slate-800">Opal</h1>
+              <LogoIcon className="h-16 w-16 text-purple-600 drop-shadow-lg animate-pulse" />
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent">
+                Teacher's Pet
+              </h1>
             </div>
-            <p className="text-slate-600 mb-8 text-lg">Welcome back! Would you like to load your saved lesson plan?</p>
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 mb-8">
+              <p className="text-slate-700 text-xl font-semibold mb-2">
+                👋 Welcome back, educator!
+              </p>
+              <p className="text-slate-600 text-lg">
+                Ready to continue your teaching journey?
+              </p>
+            </div>
             <div className="space-y-4">
               <button
                 onClick={handleLoadProgress}
-                className="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-transform transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-6 rounded-2xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-xl shadow-green-300/30"
               >
-                Load Saved Session
+                📚 Load Saved Session
               </button>
               <button
                 onClick={handleStartNew}
-                className="w-full bg-slate-200 text-slate-800 font-bold py-3 px-6 rounded-lg hover:bg-slate-300 transition"
+                className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-2xl hover:from-purple-600 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-xl shadow-purple-300/30"
               >
-                Start a New Program
+                ✨ Start a New Adventure
               </button>
             </div>
           </div>
@@ -201,26 +236,43 @@ const AppContent: React.FC = () => {
     }
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-4">
-        <div className="w-full max-w-lg text-center">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <LogoIcon className="h-16 w-16 text-indigo-600" />
-            <h1 className="text-5xl font-bold text-slate-800">Opal</h1>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4 relative overflow-hidden">
+        <div className="w-full max-w-lg text-center relative z-10">
+          <div className="flex justify-center items-center gap-4 mb-8 relative">
+            <LogoIcon className="h-20 w-20 text-purple-600 drop-shadow-lg" />
+            <div>
+              <h1 className="text-6xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 bg-clip-text text-transparent mb-2">
+                Teacher's Pet
+              </h1>
+              <div className="h-1 w-full bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 rounded-full"></div>
+            </div>
+            
           </div>
-          <p className="text-slate-600 mb-8 text-lg">Your AI-powered Master Educator & Curriculum Architect</p>
-          <div className="space-y-4">
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleGenerateCurriculum()}
-              placeholder="e.g., Quantum Mechanics, The French Revolution..."
-              className="w-full px-4 py-3 text-lg border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white text-slate-900"
-            />
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 mb-8">
+            <p className="text-slate-700 text-xl font-semibold mb-2">
+              🎓 Your AI-Powered Master Educator
+            </p>
+            <p className="text-slate-600 text-lg">
+              Transform any subject into a comprehensive, interactive learning experience with videos, quizzes, and voice narration!
+            </p>
+          </div>
+          <div className="space-y-6">
+            <div className="relative">
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleGenerateCurriculum()}
+                placeholder="✨ e.g., Quantum Mechanics, Guitar Playing, French Cooking..."
+                className="w-full px-6 py-4 text-lg border-2 border-purple-200 rounded-2xl focus:ring-4 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all bg-white/90 backdrop-blur-sm text-slate-900 placeholder-slate-500 shadow-lg"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20 rounded-2xl -z-10 blur-xl"></div>
+            </div>
+            
             <button
               onClick={handleGenerateCurriculum}
               disabled={isLoading}
-              className="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-transform transform hover:scale-105 disabled:bg-indigo-300 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white font-bold py-4 px-8 rounded-2xl hover:from-purple-700 hover:via-pink-700 hover:to-indigo-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-xl shadow-purple-300/30 relative overflow-hidden"
             >
               {isLoading ? (
                 <div className="flex flex-col items-center gap-3">
@@ -232,14 +284,21 @@ const AppContent: React.FC = () => {
                     )}
                   </div>
                 </div>
-              ) : 'Generate Lesson Program'}
+              ) : (
+                <>
+                  <span className="mr-2">🚀</span>
+                  Create My Learning Adventure
+                  <span className="ml-2">✨</span>
+                </>
+              )}
             </button>
           </div>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+          {error && (
+            <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="text-red-600 font-medium">⚠️ {error}</p>
+            </div>
+          )}
         </div>
-        <footer className="absolute bottom-4 text-slate-500 text-sm">
-          Generated by Opal. Powered by Google.
-        </footer>
       </div>
     );
   };

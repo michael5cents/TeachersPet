@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useVoice } from '../contexts/VoiceContext';
 
 // Declare ResponsiveVoice global
@@ -25,7 +25,7 @@ interface VoiceControlsProps {
   words?: string[];
 }
 
-interface VoiceSettings {
+interface _VoiceSettings {
   rate: number;
   pitch: number;
   volume: number;
@@ -35,13 +35,13 @@ interface VoiceSettings {
 
 const VoiceControls: React.FC<VoiceControlsProps> = ({ text, id, onStart, onEnd, onError }) => {
   const [isPaused, setIsPaused] = useState(false);
-  const [isResponsiveVoiceReady, setIsResponsiveVoiceReady] = useState(false);
+  const [, setIsResponsiveVoiceReady] = useState(false);
   const { 
     settings,
     currentlyPlaying, 
     startPlaying, 
     stopPlaying, 
-    forceStopAll 
+    forceStopAll: _forceStopAll 
   } = useVoice();
 
   const isPlaying = currentlyPlaying === id;
@@ -113,7 +113,7 @@ const VoiceControls: React.FC<VoiceControlsProps> = ({ text, id, onStart, onEnd,
     
     // Use simple ResponsiveVoice call (free tier)
     // Pass null for voice to use default, avoiding voice-specific API calls
-    window.responsiveVoice.speak(cleanText, null, {
+    window.responsiveVoice.speak(cleanText, undefined, {
       onstart: () => {
         console.log('✅ Speech started - reading full text');
         setIsPaused(false);
