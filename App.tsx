@@ -6,7 +6,6 @@ import MainContent from './components/MainContent';
 import Loader from './components/Loader';
 import { LogoIcon } from './components/icons';
 import { VoiceProvider } from './contexts/VoiceContext';
-import { videoSearchService } from './services/videoSearchService';
 
 const AppContent: React.FC = () => {
   const [subject, setSubject] = useState<string>('');
@@ -23,21 +22,8 @@ const AppContent: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [researchStep, setResearchStep] = useState<string>('');
 
-  // Check for saved data on initial app load and initialize API key
+  // Check for saved data on initial app load
   useEffect(() => {
-    // Initialize YouTube API key from localStorage if available
-    const savedApiKey = localStorage.getItem('youtubeApiKey');
-    if (savedApiKey) {
-      videoSearchService.setYouTubeApiKey(savedApiKey);
-      console.log('🔑 YouTube API key loaded from storage:', savedApiKey.substring(0, 12) + '...');
-    } else {
-      // Set the default API key
-      const defaultKey = 'AIzaSyARx118sjmSaGLFUKVk9ZQCaUx6JwZMW8s';
-      localStorage.setItem('youtubeApiKey', defaultKey);
-      videoSearchService.setYouTubeApiKey(defaultKey);
-      console.log('🔑 Default YouTube API key set:', defaultKey.substring(0, 12) + '...');
-    }
-
     const savedData = localStorage.getItem('opalCurriculum');
     if (savedData) {
       setInitialScreenState('load_prompt');
@@ -52,12 +38,7 @@ const AppContent: React.FC = () => {
       return;
     }
 
-    // Ensure API key is set before starting
-    const apiKey = localStorage.getItem('youtubeApiKey');
-    if (apiKey) {
-      videoSearchService.setYouTubeApiKey(apiKey);
-      console.log('🔄 API key re-confirmed before curriculum generation');
-    }
+    console.log('📚 Starting curriculum generation');
 
     setIsLoading(true);
     setError(null);
@@ -253,7 +234,7 @@ const AppContent: React.FC = () => {
               🎓 Your AI-Powered Master Educator
             </p>
             <p className="text-slate-600 text-lg">
-              Transform any subject into a comprehensive, interactive learning experience with videos, quizzes, and voice narration!
+              Transform any subject into a comprehensive, interactive learning experience with quizzes and voice narration!
             </p>
           </div>
           <div className="space-y-6">

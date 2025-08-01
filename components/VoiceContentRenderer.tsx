@@ -27,7 +27,6 @@ const VoiceContentRenderer: React.FC<VoiceContentRendererProps> = ({
 }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [highlightedWordIndex, setHighlightedWordIndex] = useState<number>(-1);
     const [processedWords, setProcessedWords] = useState<string[]>([]);
     const { settings } = useVoice();
 
@@ -57,22 +56,39 @@ const VoiceContentRenderer: React.FC<VoiceContentRendererProps> = ({
             processed = content;
         }
         
-        // Fix bold text spacing issues
+        // Fix common markdown formatting issues
         processed = processed
-            // Fix bold text that has weird indentation
+            // Fix bold text spacing issues
             .replace(/\s+\*\*([^*]+)\*\*/g, ' **$1**')  // Fix spaced bold
             .replace(/\*\*([^*]+)\*\*\s+/g, '**$1** ')  // Fix trailing spaces on bold
-            // Ensure proper line breaks for paragraphs
-            .replace(/\n\n/g, '\n\n')  // Preserve double line breaks
-            .replace(/\n([^#*-\d\s])/g, '\n\n$1')  // Add line breaks before non-list/header content
+            
+            // Fix list formatting issues
+            .replace(/^\s*[\*\-\+]\s+/gm, '- ')  // Normalize bullet points
+            .replace(/^\s*(\d+)\.\s+/gm, '$1. ')  // Normalize numbered lists
+            
+            // Fix header spacing
+            .replace(/^(#{1,6})\s*(.+)$/gm, '$1 $2')  // Ensure space after #
+            
+            // Ensure proper paragraph breaks
+            .replace(/\n\n\n+/g, '\n\n')  // Limit to double line breaks
+            .replace(/\n([^#*\-\d\s\n])/g, '\n\n$1')  // Add breaks before non-list/header content
+            
+            // Clean up whitespace
+            .replace(/[ \t]+/g, ' ')  // Multiple spaces to single space
+            .replace(/\n[ \t]+/g, '\n')  // Remove leading spaces on new lines
+            .replace(/[ \t]+\n/g, '\n')  // Remove trailing spaces before newlines
+            
+            // Fix blockquote formatting
+            .replace(/^\s*>\s+/gm, '> ')  // Normalize blockquotes
+            
+            // Ensure code blocks are properly formatted
+            .replace(/```\s*\n/g, '```\n')  // Clean code block starts
+            .replace(/\n\s*```/g, '\n```')  // Clean code block ends
+            
             .trim();
 
-        // Ensure headers have proper spacing
-        processed = processed.replace(/^([^#\n]*)\n(#{1,6}\s)/gm, '$1\n\n$2');
-        
-        // Clean up excessive whitespace
-        processed = processed.replace(/[ \t]+/g, ' ');  // Multiple spaces to single space
-        processed = processed.replace(/\n\s+/g, '\n');  // Remove leading spaces on new lines
+        // Ensure headers have proper spacing from content above
+        processed = processed.replace(/^([^\n#]+)\n(#{1,6}\s)/gm, '$1\n\n$2');
         
         return processed;
     };
@@ -106,23 +122,19 @@ const VoiceContentRenderer: React.FC<VoiceContentRendererProps> = ({
 
     const handleVoiceStart = () => {
         setIsPlaying(true);
-        setHighlightedWordIndex(-1);
     };
 
     const handleVoiceEnd = () => {
         setIsPlaying(false);
-        setHighlightedWordIndex(-1);
     };
 
     const handleVoiceError = (error: string) => {
         console.error('Voice error:', error);
         setIsPlaying(false);
-        setHighlightedWordIndex(-1);
     };
 
     const handleWordBoundary = (wordIndex: number) => {
         console.log('Word boundary callback - highlighting word index:', wordIndex);
-        setHighlightedWordIndex(wordIndex);
     };
 
     return (

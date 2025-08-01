@@ -1,7 +1,7 @@
 {
   "name": "teachers-pet",
   "version": "1.0.0",
-  "description": "AI-powered Master Educator that creates comprehensive, interactive learning curricula with text-to-speech capabilities",
+  "description": "AI-powered Master Educator that creates comprehensive, interactive learning curricula with voice narration and quizzes",
   "type": "module",
   "main": "index.html",
   "homepage": "https://github.com/michael5cents/TeachersPet",
@@ -20,7 +20,6 @@
     "react",
     "typescript",
     "gemini-ai",
-    "responsivevoice",
     "learning",
     "teaching"
   ],
@@ -34,9 +33,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/genai": "^1.11.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@google/genai": "^1.11.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

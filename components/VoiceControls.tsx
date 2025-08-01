@@ -25,13 +25,6 @@ interface VoiceControlsProps {
   words?: string[];
 }
 
-interface _VoiceSettings {
-  rate: number;
-  pitch: number;
-  volume: number;
-  voice: string;
-  enabled: boolean;
-}
 
 const VoiceControls: React.FC<VoiceControlsProps> = ({ text, id, onStart, onEnd, onError }) => {
   const [isPaused, setIsPaused] = useState(false);

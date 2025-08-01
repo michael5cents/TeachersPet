@@ -9,19 +9,11 @@ export interface Quiz {
   questions: QuizQuestion[];
 }
 
-export interface CurriculumVideo {
-  title: string;
-  platform: 'youtube' | 'vimeo' | 'khan-academy' | 'ted-ed' | 'peertube';
-  relevanceDescription: string;
-  _videoData?: any; // Full VideoResult data for UI components
-}
-
 export interface Module {
   moduleNumber: number;
   title: string;
   learningObjectives: string[];
   content: string; // Markdown content
-  videos: CurriculumVideo[];
   quiz: Quiz;
 }
 
